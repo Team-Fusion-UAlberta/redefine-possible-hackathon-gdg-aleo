@@ -12,15 +12,15 @@ export default function LoginPage() {
         if (!username || !password) {
             Alert.alert('Validation Error', 'Please enter both username and password.');
         } else {
-            Alert.alert('Login Success', `Welcome, ${username}!`);
+            Alert.alert('Login Success', `Hi, ${username}!`);
             router.replace('/(tabs)'); // Navigate to main tab layout
         }
     };
 
 
     const userCredentials = {
-        username: 'a',
-        password: 'a',
+        username: 'gemma',
+        password: 'gemma123',
     };
 
     setTimeout(() => {

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const categories = [
   { name: 'Science', icon: 'flask', color: '#FFB6C1' },
   { name: 'Trades', icon: 'wrench', color: '#6B8E23' },
   { name: 'Business', icon: 'briefcase', color: '#F2C700' },
   { name: 'Engineering', icon: 'cogs', color: '#5DADE2' },
-  { name: 'Culinary', icon: 'cutlery', color: '#F9A800' },
+  { name: 'Culinary', icon: 'utensils', color: '#F9A800' },
   { name: 'Law', icon: 'gavel', color: '#C8A2D4' },
   { name: 'Arts', icon: 'paint-brush', color: '#EC7063' },
   { name: 'Animals & Plants', icons: ['paw', 'pagelines'], color: '#A3C4D3' },
@@ -16,18 +16,44 @@ const categories = [
 ];
 
 const jobs = [
-  { name: 'Mei, Blockchain Developer', image: require('../../assets/images/bcdev.png'), description: 'Develop cutting-edge technologies that power secure and decentralized networks for the future.' },
-  { name: 'Amara, Zoo Keeper', image: require('../../assets/images/zoo.png'), description: 'Care for animals and educate the public about wildlife.' },
-  { name: 'Zara, Judge', image: require('../../assets/images/judge.png'), description: 'Preside over court cases, ensuring justice is served and the law is upheld for all.' },
-  { name: 'Sofia, Civil Engineer', image: require('../../assets/images/cive.png'), description: 'Design and build the infrastructure that keeps societies running.' },
-  { name: 'Hana, Chemist', image: require('../../assets/images/chemist.png'), description: 'Use science to create solutions in industries like pharmaceuticals, food, and manufacturing.' },
-  { name: 'Aisha, Planner', image: require('../../assets/images/planner.png'), description: 'Create detailed plans that shape cities, neighborhoods, and projects to improve quality of life.' },
-  { name: 'Priya, Marketer', image: require('../../assets/images/marketer.png'), description: 'Craft compelling strategies to connect brands with their audience, driving engagement and growth.' },
+  { name: 'Mei, Blockchain Developer', image: require('../../assets/images/bcdev.png'), description: 'Develop cutting-edge technologies that power secure and decentralized networks for the future.', icon: 'flask' },
+  { name: 'Amara, Zoo Keeper', image: require('../../assets/images/zoo.png'), description: 'Care for animals and educate the public about wildlife.', icon: 'paw' },
+  { name: 'Zara, Judge', image: require('../../assets/images/judge.png'), description: 'Preside over court cases, ensuring justice is served and the law is upheld for all.', icon: 'gavel' },
+  { name: 'Sofia, Civil Engineer', image: require('../../assets/images/cive.png'), description: 'Design and build the infrastructure that keeps societies running.', icon: 'cogs' },
+  { name: 'Hana, Chemist', image: require('../../assets/images/chemist.png'), description: 'Use science to create solutions in industries like pharmaceuticals, food, and manufacturing.', icon: 'flask' },
+  { name: 'Aisha, Planner', image: require('../../assets/images/planner.png'), description: 'Create detailed plans that shape cities, neighborhoods, and projects to improve quality of life.', icon: 'cogs' },
+  { name: 'Priya, Marketer', image: require('../../assets/images/marketer.png'), description: 'Craft compelling strategies to connect brands with their audience, driving engagement and growth.', icon: 'briefcase' },
+];
+
+const scienceJobs = [
+  { name: 'Mathematician', icon: 'calculator', description: 'Apply mathematical theories and techniques to solve problems in various industries, including finance, engineering, and research.' },
+  { name: 'Chemist', icon: 'flask', description: 'Study the composition, properties, and reactions of substances to develop new products or improve existing ones.' },
+  { name: 'Biochemist', icon: 'flask', description: 'Explore the chemical processes within living organisms to improve health, develop pharmaceuticals, or advance medical technologies.' },
+  { name: 'Zoologist', icon: 'paw', description: 'Study animals and their ecosystems to understand behaviors, species conservation, and biological functions.' },
+  { name: 'Veterinarian', icon: 'stethoscope', description: 'Diagnose and treat diseases, injuries, and health problems in animals, from pets to livestock.' },
+  { name: 'Software Developer', icon: 'laptop', description: 'Design, create, and maintain software applications to solve specific problems or meet the needs of users.' },
+  { name: 'Firmware Developer', icon: 'microchip', description: 'Write low-level code for embedded systems in hardware devices, ensuring proper functionality of electronic products.' },
+  { name: 'Robotics Engineer', icon: 'cogs', description: 'Design, build, and maintain robots or automated systems for manufacturing, healthcare, or exploration.' },
+  { name: 'Environmental Scientist', icon: 'leaf', description: 'Study environmental problems like pollution or climate change and develop solutions to mitigate these issues.' },
+  { name: 'Geneticist', icon: 'dna', description: 'Study genes, heredity, and genetic variations to understand and treat genetic disorders or develop genetically modified organisms.' },
+  { name: 'Neuroscientist', icon: 'brain', description: 'Explore the brain and nervous system to better understand neurological disorders, cognition, and behavior.' },
+  { name: 'Astrophysicist', icon: 'star', description: 'Investigate the universe, from stars to galaxies, and develop theories about space, time, and the nature of the cosmos.' },
+  { name: 'Pharmacologist', icon: 'medkit', description: 'Study the effects of drugs on living organisms to develop new medications and improve existing treatments.' },
+  { name: 'Marine Biologist', icon: 'fish', description: 'Study ocean ecosystems, marine life, and the impact of human activities on the oceans and coastal regions.' },
+  { name: 'Forensic Scientist', icon: 'search', description: 'Apply science to criminal investigations by analyzing physical evidence like DNA, fingerprints, and other trace materials.' },
+  { name: 'Epidemiologist', icon: 'heartbeat', description: 'Study patterns of diseases in populations and work on public health solutions to prevent the spread of diseases.' },
+  { name: 'Agricultural Scientist', icon: 'pagelines', description: 'Work on improving farming methods, crops, and livestock to increase food production and sustainability.' },
+  { name: 'Quantum Computing Researcher', icon: 'superpowers', description: 'Work in cutting-edge technologies that utilize quantum mechanics.' },
+  { name: 'Chemical Engineer', icon: 'industry', description: 'Apply chemistry and engineering principles to solve problems related to the production and use of chemicals, materials, and energy.' },
+  { name: 'Data Scientist', icon: 'chart-line', description: 'Use scientific methods, algorithms, and data analysis to extract insights from large datasets to inform decision-making and predictive modeling.' }
 ];
 
 export default function MainPage() {
   const [modalVisible, setModalVisible] = useState(true);
   const [jobModalVisible, setJobModalVisible] = useState(false);
+  const [scienceModalVisible, setScienceModalVisible] = useState(false);
+  const [qcModalVisible, setQcModalVisible] = useState(false);
+  const [post, setPost] = useState('');
 
   const closePopup = () => {
     setModalVisible(false);
@@ -41,6 +67,33 @@ export default function MainPage() {
     setJobModalVisible(false);
   };
 
+  const openScienceModal = () => {
+    setScienceModalVisible(true);
+  };
+
+  const closeScienceModal = () => {
+    setScienceModalVisible(false);
+  };
+
+  const openQcModal = () => {
+    setQcModalVisible(true);
+  };
+
+  const closeQcModal = () => {
+    setQcModalVisible(false);
+  };
+
+  const handlePostChange = (text) => {
+    setPost(text);
+  };
+
+  const handlePostSubmit = () => {
+    // Submit the post (for now just log it to the console lol)
+    console.log('New Post:', post);
+    setPost(''); // Clear the input field
+  };
+
+
   return (
     <View style={styles.container}>
       {/* Popup Modal */}
@@ -51,7 +104,7 @@ export default function MainPage() {
               <Text style={styles.closeText}>x</Text>
             </TouchableOpacity>
             <Image source={require('../../assets/images/carpenter.png')} style={styles.modalImage} />
-            <Text style={styles.modalTitle}>Hi! I'm Maya</Text>
+            <Text style={styles.modalTitle}>Hi! I'm Maya   <Icon name="wrench" size={25} color="#6B8E23" style={styles.icon} /></Text>
             <Text style={styles.modalText}>
               I work as a Carpenter. I always loved spending time with my dad in his workshop. The smell of sawdust, the rhythmic thud of the hammer, the way he could transform a pile of wood into something beautiful…
               {'\n\n'}
@@ -65,8 +118,67 @@ export default function MainPage() {
         </View>
       </Modal>
 
+      {/* Quantum Computing Post Modal */}
+      <Modal visible={qcModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.qcModalContent}>
+            <TouchableOpacity style={styles.closeButton} onPress={closeQcModal}>
+              <Text style={styles.closeText}>x</Text>
+            </TouchableOpacity>
+            <View style={styles.qcModalHeader}>
+              <Text style={styles.qcTitle}>Quantum Computing Post</Text>
+            </View>
+            <TextInput
+              style={styles.qcInput}
+              placeholder="Write your post..."
+              value={post}
+              onChangeText={handlePostChange}
+              multiline
+            />
+            <TouchableOpacity style={styles.qcPostSubmitButton} onPress={handlePostSubmit}>
+              <Text style={styles.qcPostSubmitButtonText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Science Jobs Modal */}
+      <Modal visible={scienceModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.scienceModalContent}>
+            <TouchableOpacity style={styles.closeButton} onPress={closeScienceModal}>
+              <Text style={styles.closeText}>x</Text>
+            </TouchableOpacity>
+            <View style={styles.scienceModalBox}></View>
+            <FlatList
+              data={scienceJobs}
+              keyExtractor={(item) => item.name}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (item.name === 'Quantum Computing Researcher') {
+                      openQcModal();
+                    }
+                  }}
+                >
+                  <View style={styles.scienceJobItem}>
+                    <Text style={styles.scienceJobImage}>
+                      <Icon name={item.icon} size={25} color="#6B8E23" />
+                    </Text>
+                    <View style={styles.scienceJobTextContainer}>
+                      <Text style={styles.scienceJobTitle}>{item.name}</Text>
+                      <Text style={styles.scienceJobDescription}>{item.description}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </Modal >
+
       {/* Jobs Modal */}
-      <Modal visible={jobModalVisible} animationType="slide" transparent={true}>
+      < Modal visible={jobModalVisible} animationType="slide" transparent={true} >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <TouchableOpacity style={styles.closeButton} onPress={closeJobModal}>
@@ -77,53 +189,57 @@ export default function MainPage() {
               data={jobs}
               keyExtractor={(item) => item.name}
               renderItem={({ item }) => (
-                <View style={styles.jobList}>
-                  <View style={styles.jobItem}>
-                    <Image source={item.image} style={styles.jobImage} />
-                    <View style={styles.jobTextContainer}>
-                      <Text style={styles.jobTitle}>{item.name}</Text>
-                      <Text style={styles.jobDescription}>{item.description}</Text>
-                    </View>
+                <View style={styles.jobItem}>
+                  <Image source={item.image} style={styles.jobImage} />
+                  <View style={styles.jobTextContainer}>
+                    <Text style={styles.jobTitle}>{item.name} </Text>
+                    <Text style={styles.jobDescription}>{item.description}</Text>
                   </View>
                 </View>
               )}
             />
           </View>
         </View>
-      </Modal>
+      </Modal >
 
       {/* Top Bar */}
-      <View style={styles.topBar}>
+      < View style={styles.topBar} >
         <Icon name="star" size={40} color="#FFD700" style={styles.icon} onPress={openJobModal} />
         <TextInput
           style={styles.searchBar}
           placeholder="Search jobs..."
           placeholderTextColor="#666"
         />
-      </View>
+      </View >
 
       {/* Job Categories */}
-      <FlatList
+      < FlatList
         data={categories}
         numColumns={2}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item) => item.name
+        }
         renderItem={({ item }) => (
-          <TouchableOpacity style={[styles.categoryButton, { backgroundColor: item.color }]}>
+          <TouchableOpacity
+            style={[styles.categoryButton, { backgroundColor: item.color }]}
+            onPress={() => {
+              if (item.name === 'Science') {
+                openScienceModal();  // Open Science Modal if category is 'Science'
+              }
+            }}
+          >
             {item.icons ? (
-              // Render multiple icons side by side for Animals & Plants
               <View style={styles.iconContainer}>
                 <Icon name={item.icons[0]} size={32} color="white" style={[styles.categoryIcon, { marginRight: 10 }]} />
                 <Icon name={item.icons[1]} size={32} color="white" style={styles.categoryIcon} />
               </View>
             ) : (
-              // Single icon for other categories
               <Icon name={item.icon} size={40} color="white" style={styles.categoryIcon} />
             )}
             <Text style={styles.categoryText}>{item.name}</Text>
           </TouchableOpacity>
         )}
       />
-    </View>
+    </View >
   );
 }
 
@@ -134,6 +250,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#b1cf86',
   },
   modalBox: {
+    backgroundColor: '#b1cf86',
+    height: 30,
+  },
+  scienceModalBox: {
     backgroundColor: '#b1cf86',
     height: 30,
   },
@@ -194,6 +314,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  scienceModalContent: {
+    width: '89%',
+    height: '80%',
+    backgroundColor: '#A8D08D',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   closeButton: {
     position: 'absolute',
     top: 10,
@@ -228,8 +357,17 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     alignItems: 'center',
     backgroundColor: 'white',
-    width: 300,
+    width: 310,
     height: 70,
+    borderRadius: 10,
+  },
+  scienceJobItem: {
+    flexDirection: 'row',
+    marginBottom: 13,
+    alignItems: 'left',
+    backgroundColor: 'white',
+    width: 310,
+    height: 100,
     borderRadius: 10,
   },
   jobImage: {
@@ -239,7 +377,20 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginLeft: 10,
   },
+  scienceJobImage: {
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    borderRadius: 25,
+    marginLeft: 20,
+    marginRight: -10,
+    marginTop: 35,
+  },
   jobTextContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
+  scienceJobTextContainer: {
     flex: 1,
     marginRight: 10,
   },
@@ -247,8 +398,53 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  scienceJobTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    marginTop: 9,
+  },
   jobDescription: {
     fontSize: 12,
-    color: '#666',
+    color: 'black',
   },
-});
+  scienceJobDescription: {
+    fontSize: 12,
+    color: 'black',
+    marginLeft: 10,
+    marginTop: 3,
+  },
+  qcModalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10
+  },
+  qcModalHeader: {
+    marginBottom: 10
+  },
+  qcTitle: {
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  qcInput: {
+    height: 150,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 20
+  },
+  qcSubmitButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center'
+  },
+  qcSubmitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+}); 
