@@ -1,345 +1,145 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Modal, TextInput } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, TextInput, StyleSheet, SafeAreaView, TouchableOpacity, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { GoogleGenAI } from "@google/genai";
 
-export default function MainPage() {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [selectedChat, setSelectedChat] = useState(null);
-    const [inputMessage, setInputMessage] = useState('');
+const GreenInputScreen = () => {
+  const [inputText, setInputText] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-    const chatHistory = [
-        {
-            id: '1',
-            message: "Yes, I love cats too! I want to be a vet, so I'm volunteering at a local humane society!! XD",
-            time: '11:30 AM',
-            sender: 'Aleo Doe',
-            senderType: 'real',
-            profileImage: require('../../assets/images/redefine_girl2.png'),
-            detailedHistory: [
-                { sender: 'You', message: "Hey!! Do you like animals? I saw in your profile that you do. I'm interested in getting a job related to animals. What are some things you do to get involved?", time: "11:00 AM" },
-                { sender: 'Aleo Doe', message: "Yes, I love cats and dogs! I want to be a vet, so I'm volunteering at a local humane society!! XD", time: "11:30 AM" }
-            ]
-        },
-        {
-            id: '2',
-            message: "Sure, I'd be happy to tell you more about Machine Learning Developers ...",
-            time: '8:15 AM',
-            sender: 'Gemini Chatbot',
-            senderType: 'chatbot',
-            profileImage: require('../../assets/images/gemini_logo.png'),
-            detailedHistory: [
-                { sender: 'You', message: "Hi Gemini! My mom is a Machine Learning Developer, and I want to learn more about the job. Can you tell me more about it?", time: "8:15 AM" },
-                { sender: 'Gemini Chatbot', message: "Sure, I'd be happy to tell you more about Machine Learning Developers!\nWhat is Machine Learning?\nMachine learning is a type of artificial intelligence (AI) that allows computers to learn from data without being explicitly programmed. This means that instead of giving a computer a set of rules to follow, you give it a bunch of data and let it figure out the rules on its own.\n...", time: "8:15 AM" }
-            ]
-        },
-        {
-            id: '3',
-            message: "Here's a detailed roadmap for breaking into AI with zero experience or knowledge. It will ...",
-            time: '7:43 AM',
-            sender: 'Gemini Chatbot',
-            senderType: 'real',
-            profileImage: require('../../assets/images/gemini_logo.png'),
-        }
-    ];
+  // Initialize Gemini AI (move your API key to environment variables in production)
+  const ai = new GoogleGenAI({ apiKey: "apikey" });
 
-    const openChat = (chat) => {
-        if (chat.detailedHistory) {
-            setSelectedChat(chat);
-            setModalVisible(true);
-        }
-    };
+  const handleSubmit = async () => {
+    if (!inputText.trim()) return;
+    
+    try {
+      setIsLoading(true);
+      setError('');
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: inputText,
+      });
 
-    const handleSendMessage = () => {
-        if (inputMessage.trim()) {
-            // Handle sending message logic
-            setInputMessage('');
-        }
-    };
+      setAiResponse(response.text);
+    } catch (err) {
+      console.error("Error generating content:", err);
+      setError('Failed to get response from AI. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.upperBackground} />
-            <View style={styles.dogpic}>
-                <Image source={require('../../assets/images/dog.png')} style={styles.dogpic} />
-            </View>
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          placeholder="Ask Gemini anything..."
+          placeholderTextColor="#ccc"
+          value={inputText}
+          onChangeText={setInputText}
+          editable={!isLoading}
+        />
+        <TouchableOpacity 
+          style={[styles.submitButton, (!inputText.trim() || isLoading) && styles.submitButtonDisabled]} 
+          onPress={handleSubmit}
+          disabled={!inputText.trim() || isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.submitText}>Submit</Text>
+          )}
+        </TouchableOpacity>
+      </View>
 
-            {/* Profile Picture at the Intersection */}
-            <View style={styles.profileContainer}>
-                <View style={styles.circle}></View>
-                <View style={styles.profileCircle}>
-                    <Image source={require('../../assets/images/redefine_girl.png')} style={styles.profileCircle} />
-                </View>
-                <Text style={styles.name}>Gemma Doe</Text>
-            </View>
-
-            {/* Interests Section */}
-            <View style={styles.interestsContainer}>
-                {['Blockchain', 'Baking', 'Animals', 'AI', 'ML'].map((interest, index) => (
-                    <View key={index} style={styles.interestBox}>
-                        <Text style={styles.interestText}>{interest}</Text>
-                    </View>
-                ))}
-            </View>
-
-            {/* Chat History */}
-            <View style={styles.chatContainer}>
-                <Text style={styles.chatHistory}>Chat History</Text>
-                <FlatList
-                    data={chatHistory}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.chatBox} onPress={() => openChat(item)}>
-                            <View style={styles.chatHeader}>
-                                <Image
-                                    source={item.profileImage}
-                                    style={styles.chatProfileImage}
-                                />
-                                <Text style={styles.chatSender}>{item.sender}</Text>
-                            </View>
-                            <Text style={styles.chatMessage}>{item.message}</Text>
-                            <Text style={styles.chatTime}>{item.time}</Text>
-                        </TouchableOpacity>
-                    )}
-                />
-            </View>
-
-            {/* Chat Popup Modal */}
-            <Modal visible={modalVisible} animationType="slide" transparent={true}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        {selectedChat && (
-                            <>
-                                <View style={styles.modalHeader}>
-                                    <Ionicons name="expand" size={24} color="black" style={styles.expandIcon} />
-                                    <Text style={styles.modalTitle}>{selectedChat.sender}</Text>
-                                    <Ionicons name="close" size={24} color="black" style={styles.closeIcon} onPress={() => setModalVisible(false)} />
-                                </View>
-                                <FlatList
-                                    data={selectedChat.detailedHistory}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    renderItem={({ item }) => (
-                                        <View style={[styles.chatBubble, item.sender === 'You' ? styles.rightBubble : styles.leftBubble]}>
-                                            <Text style={styles.modalSender}>{item.sender}</Text>
-                                            <Text style={styles.modalMessage}>{item.message}</Text>
-                                            <Text style={styles.modalTime}>{item.time}</Text>
-                                        </View>
-                                    )}
-                                />
-                                <View style={styles.inputContainer}>
-                                    <Ionicons name="attach" size={24} color="#6B8E23" style={styles.clipIcon} />
-                                    <TextInput
-                                        style={styles.inputBox}
-                                        placeholder="Type a message..."
-                                    />
-                                    <Ionicons
-                                        name="send"
-                                        size={24}
-                                        color="#6B8E23"
-                                        style={styles.sendIcon}
-                                        onPress={handleSendMessage}
-                                    />
-                                </View>
-                            </>
-                        )}
-                    </View>
-                </View>
-            </Modal>
-        </View>
-    );
-}
+      <ScrollView style={styles.responseContainer}>
+        {error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : aiResponse ? (
+          <>
+            <Text style={styles.responseHeader}>Gemini Response:</Text>
+            <Text style={styles.responseText}>{aiResponse}</Text>
+          </>
+        ) : (
+          <Text style={styles.placeholderText}>Your AI response will appear here...</Text>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#b1cf86',
-    },
-    upperBackground: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '25%',
-        backgroundColor: '#EAEAEA',
-    },
-    dogpic: {
-        marginBottom: -151,
-        width: '100%',
-        marginTop: -115,
-    },
-    profileContainer: {
-        position: 'absolute',
-        top: '18%',
-        left: 0,
-        right: 0,
-        alignItems: 'left',
-        marginLeft: 10,
-    },
-    profileCircle: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        marginTop: -65,
-        marginLeft: 5,
-    },
-    circle: {
-        width: 140,
-        height: 140,
-        marginTop: 10,
-        borderRadius: 80,
-        backgroundColor: '#b1cf86',
-    },
-    name: {
-        marginLeft: 150,
-        marginTop: -165,
-        fontSize: 30,
-        fontWeight: 'bold',
-        color: 'white',
-    },
-    interestsContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        marginTop: 310,
-        marginLeft: 128,
-    },
-    interestBox: {
-        backgroundColor: '#EC7063',
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-        margin: 5,
-    },
-    interestText: {
-        color: 'white',
-        fontSize: 14,
-        fontWeight: 'bold',
-    },
-    chatContainer: {
-        marginTop: 20,
-        paddingHorizontal: 20,
-        marginTop: -15,
-    },
-    chatHistory: {
-        color: 'white',
-        fontSize: 16.5,
-        fontWeight: 'bold',
-        marginBottom: 9,
-    },
-    chatBox: {
-        backgroundColor: '#f2f2f2',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 10,
-    },
-    chatHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    chatProfileImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        marginRight: 10,
-    },
-    chatSender: {
-        fontWeight: 'bold',
-        fontSize: 14,
-    },
-    chatMessage: {
-        fontSize: 14,
-        color: '#333',
-    },
-    chatTime: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 5,
-        textAlign: 'right',
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        width: '89%',
-        height: '70%',
-        padding: 20,
-        borderRadius: 10,
-        alignItems: 'center',
-        backgroundColor: '#b1cf86',
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 10,
-    },
-    expandIcon: {
-        position: 'absolute',
-        left: 0,
-    },
-    closeIcon: {
-        position: 'absolute',
-        right: 0,
-    },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        alignItems: 'center',
-    },
-    chatBubble: {
-        padding: 10,
-        borderRadius: 10,
-        marginVertical: 7,
-        maxWidth: '80%',
-    },
-    leftBubble: {
-        alignSelf: 'flex-start',
-        backgroundColor: '#ddd',
-        marginRight: 50,
-    },
-    rightBubble: {
-        alignSelf: 'flex-end',
-        backgroundColor: '#6B8E23',
-    },
-    modalSender: {
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    modalMessage: {
-        fontSize: 15.5,
-        color: 'blacks',
-    },
-    modalTime: {
-        marginTop: 10,
-        fontSize: 12,
-        color: 'black',
-        textAlign: 'right',
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderColor: '#ddd',
-        marginTop: 10,
-        width: '105%',
-        padding: 10,
-    },
-    inputBox: {
-        flex: 1,
-        padding: 10,
-        borderRadius: 20,
-        backgroundColor: '#f2f2f2',
-        marginRight: 5,
-    },
-    clipIcon: {
-        marginRight: 10,
-    },
-    sendIcon: {
-        marginLeft: 10,
-    }
+  container: {
+    flex: 1,
+    backgroundColor: '#4CAF50',
+    padding: 10,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginBottom: 10,
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+    paddingHorizontal: 10,
+  },
+  submitButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
+  submitText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  responseContainer: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 15,
+    marginTop: 5,
+  },
+  responseHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginBottom: 10,
+  },
+  responseText: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });
+
+export default GreenInputScreen;
