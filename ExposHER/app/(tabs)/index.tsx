@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 const categories = [
   { name: 'Science', icon: 'flask', color: '#FFB6C1' },
-  { name: 'Construction', icon: 'wrench', color: '#6B8E23' },
+  { name: 'Trades', icon: 'wrench', color: '#6B8E23' },
   { name: 'Business', icon: 'briefcase', color: '#F2C700' },
   { name: 'Engineering', icon: 'cogs', color: '#5DADE2' },
   { name: 'Culinary', icon: 'cutlery', color: '#F9A800' },
