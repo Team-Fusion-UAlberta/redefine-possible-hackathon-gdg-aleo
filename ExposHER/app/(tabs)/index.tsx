@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, Image, ActivityIndicator, ScrollView, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { GoogleGenAI } from "@google/genai";
+
 
 const categories = [
   { name: 'Science', icon: 'flask', color: '#FFB6C1' },
@@ -53,7 +55,14 @@ export default function MainPage() {
   const [jobModalVisible, setJobModalVisible] = useState(false);
   const [scienceModalVisible, setScienceModalVisible] = useState(false);
   const [qcModalVisible, setQcModalVisible] = useState(false);
+  const [geminiModalVisible, setGeminiModalVisible] = useState(false);
   const [post, setPost] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Initialize Gemini AI (move your API key to environment variables in production)
+  const ai = new GoogleGenAI({ apiKey: "AIzaSyAKWZTiwgZcfsQi7yK177wakblerVQR96c" });
 
   const closePopup = () => {
     setModalVisible(false);
@@ -83,6 +92,14 @@ export default function MainPage() {
     setQcModalVisible(false);
   };
 
+  const openGeminiModal = () => {
+    setGeminiModalVisible(true);
+  };
+
+  const closeGeminiModal = () => {
+    setGeminiModalVisible(false);
+  };
+
   const handlePostChange = (text) => {
     setPost(text);
   };
@@ -93,9 +110,62 @@ export default function MainPage() {
     setPost(''); // Clear the input field
   };
 
+  const handleSubmit = async () => {
+    const geminiInput = "I am a 12 year old girl that is interested in AI, ML, Blockchain, Baking, and Animals. Can you please create a roadmap/steps that I would have to take to learn about quantum computing and include projects that include my interest? Limit it to 6 sentences";
+
+    try {
+      setIsLoading(true);
+      setError('');
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: geminiInput, // Use hardcoded input
+      });
+
+      setAiResponse(response.text);
+    } catch (err) {
+      console.error("Error generating content:", err);
+      setError('Failed to get response from AI. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <View style={styles.container}>
+
+      {/* Gemini Roadmap Modal */}
+      <Modal visible={geminiModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.geminiModalContainer}>
+            <TouchableOpacity
+              style={[styles.geminiSubmitButton, (isLoading) && styles.geminiSubmitButtonDisabled]}
+              onPress={handleSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.geminiSubmitText}>Get AI Response</Text>
+              )}
+            </TouchableOpacity>
+
+            {error ? (
+              <Text style={styles.errorText}>{error}</Text>
+            ) : aiResponse ? (
+              <>
+                <Text style={styles.responseHeader}>Gemini Response:</Text>
+                <Text style={styles.responseText}>{aiResponse}</Text>
+              </>
+            ) : (
+              <Text style={styles.placeholderText}>Your AI response will appear here...</Text>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+
       {/* Popup Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
@@ -122,11 +192,20 @@ export default function MainPage() {
       <Modal visible={qcModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.qcModalContent}>
-            <TouchableOpacity style={styles.closeButton} onPress={closeQcModal}>
-              <Text style={styles.closeText}>x</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={() => {
+              closeQcModal();
+              openScienceModal();
+            }}>
+              <Text style={styles.qcCloseText}>x</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeButton} onPress={() => {
+              closeQcModal();
+              openGeminiModal();
+            }}>
+              <Text style={styles.qcCloseText}>roadmap</Text>
             </TouchableOpacity>
             <View style={styles.qcModalHeader}>
-              <Text style={styles.qcTitle}>Quantum Computing Post</Text>
+              <Text style={styles.qcTitle}>Quantum Computing</Text>
             </View>
             <TextInput
               style={styles.qcInput}
@@ -156,7 +235,8 @@ export default function MainPage() {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => {
-                    if (item.name === 'Quantum Computing Researcher') {
+                    if (item.name === "Quantum Computing Researcher") {
+                      closeScienceModal();
                       openQcModal();
                     }
                   }}
@@ -241,9 +321,55 @@ export default function MainPage() {
       />
     </View >
   );
-}
+};
 
 const styles = StyleSheet.create({
+  geminiModalContainer: {
+    width: '90%',
+    height: '80%',
+    backgroundColor: '#b1cf86',
+    padding: 20,
+    borderRadius: 10,
+  },
+  geminiSubmitButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  geminiSubmitButtonDisabled: {
+    opacity: 0.5,
+  },
+  geminiSubmitText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  responseHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginBottom: 10,
+  },
+  responseText: {
+    backgroundColor: 'white',
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  placeholderText: {
+    backgroundColor: 'white',
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  errorText: {
+    backgroundColor: 'white',
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -333,6 +459,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
+  qcCloseText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#333',
+  },
   modalImage: {
     width: 150,
     height: 150,
@@ -414,18 +545,26 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 3,
   },
+  qcModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#A8D08D',
+  },
   qcModalContent: {
-    width: '80%',
-    backgroundColor: 'white',
+    width: '90%',
+    height: '80%',
+    backgroundColor: '#b1cf86',
     padding: 20,
-    borderRadius: 10
+    borderRadius: 10,
   },
   qcModalHeader: {
     marginBottom: 10
   },
   qcTitle: {
     fontSize: 20,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    marginTop: 30,
   },
   qcInput: {
     height: 150,
