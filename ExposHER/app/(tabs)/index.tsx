@@ -414,6 +414,10 @@ export default function MainPage() {
           placeholder="Search jobs..."
           placeholderTextColor="#666"
         />
+        <Image
+          source={require('../../assets/images/gemini_logo-removebg.png')}  // Replace with your image path
+          style={styles.geminiImageIcon}  // Styling for the image
+        />
       </View >
 
       {/* Job Categories */}
@@ -448,6 +452,11 @@ export default function MainPage() {
 };
 
 const styles = StyleSheet.create({
+  geminiImageIcon: {
+    width: 40,
+    height: 40,
+    marginLeft: 10,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -32,7 +32,7 @@ export default function LoginPage() {
     return (
 
         <View style={styles.container}>
-            <Image source={require("../assets/images/icon.png")} style={styles.logo} />
+            <Image source={require("../assets/images/app_logo.png")} style={styles.logo} />
             <Text style={styles.title}></Text>
 
             {/* Username Input */}
@@ -111,9 +111,10 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     logo: {
-        width: 500,  // Adjust the width of the logo to make it smaller
-        height: 300, // Adjust the height of the logo to make it smaller
+        width: 600,  // Adjust the width of the logo to make it smaller
+        height: 400, // Adjust the height of the logo to make it smaller
         marginTop: -70, // Space below the logo
+        marginBottom: -80,
         resizeMode: 'contain', // Ensure the image scales correctly
     },
 });
