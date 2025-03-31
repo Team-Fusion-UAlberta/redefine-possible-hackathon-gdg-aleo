@@ -27,6 +27,12 @@ const jobs = [
   { name: 'Priya, Marketer', image: require('../../assets/images/marketer.png'), description: 'Craft compelling strategies to connect brands with their audience, driving engagement and growth.', icon: 'briefcase' },
 ];
 
+const discussionHistory = [
+  { name: 'TwinkleNorth', image: require('../../assets/images/annonymous_pfp.png'), description: 'How do qubits work compared to regular bits?', comments: "6", upvotes: "10", downvotes: "0" },
+  { name: 'Aleo', image: require('../../assets/images/redefine_girl2.png'), description: 'Is quantum computing actually useful today, or is it just overhyped?', comments: "20", upvotes: "3", downvotes: "7" },
+  { name: 'NovaGuidance', image: require('../../assets/images/annonymous_pfp3.png'), description: 'NEW TO QUANTUM COMPUTING!!!', comments: "17", upvotes: "12", downvotes: "0" },
+  { name: 'CelestialGlow', image: require('../../assets/images/annonymous_pfp2.png'), description: 'Is math discovered or invented? (The ultimate nerd war)', comments: "31", upvotes: "25", downvotes: "0" },
+];
 const scienceJobs = [
   { name: 'Mathematician', icon: 'calculator', description: 'Apply mathematical theories and techniques to solve problems in various industries, including finance, engineering, and research.' },
   { name: 'Chemist', icon: 'flask', description: 'Study the composition, properties, and reactions of substances to develop new products or improve existing ones.' },
@@ -56,6 +62,7 @@ export default function MainPage() {
   const [scienceModalVisible, setScienceModalVisible] = useState(false);
   const [qcModalVisible, setQcModalVisible] = useState(false);
   const [geminiModalVisible, setGeminiModalVisible] = useState(false);
+  const [roadmapModalVisible, setRoadmapModalVisible] = useState(false);
   const [post, setPost] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -102,6 +109,14 @@ export default function MainPage() {
 
   const handlePostChange = (text) => {
     setPost(text);
+  };
+
+  const openRoadmapModal = () => {
+    setRoadmapModalVisible(true);
+  };
+
+  const closeRoadmapModal = () => {
+    setRoadmapModalVisible(false);
   };
 
   const handlePostSubmit = () => {
@@ -173,6 +188,19 @@ export default function MainPage() {
             <TouchableOpacity style={styles.closeButton} onPress={closePopup}>
               <Text style={styles.closeText}>x</Text>
             </TouchableOpacity>
+            <Image source={require('../../assets/images/old_gemma.png')} style={styles.oldGemma} />
+            <Text style={styles.oldGemmaText}>Gemma as a Quantum Computing Researcher!</Text>
+          </View>
+        </View>
+      </Modal>
+
+      {/* roadmap Modal */}
+      <Modal visible={roadmapModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity style={styles.closeButton} onPress={closeRoadmapModal}>
+              <Text style={styles.closeText}>x</Text>
+            </TouchableOpacity>
             <Image source={require('../../assets/images/carpenter.png')} style={styles.modalImage} />
             <Text style={styles.modalTitle}>Hi! I'm Maya   <Icon name="wrench" size={25} color="#6B8E23" style={styles.icon} /></Text>
             <Text style={styles.modalText}>
@@ -188,6 +216,7 @@ export default function MainPage() {
         </View>
       </Modal>
 
+
       {/* Quantum Computing Post Modal */}
       <Modal visible={qcModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
@@ -198,18 +227,13 @@ export default function MainPage() {
             }}>
               <Text style={styles.qcCloseText}>x</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.closeButton} onPress={() => {
-              closeQcModal();
-              openGeminiModal();
-            }}>
-              <Text style={styles.qcCloseText}>roadmap</Text>
-            </TouchableOpacity>
             <View style={styles.qcModalHeader}>
               <Text style={styles.qcTitle}>Quantum Computing</Text>
             </View>
             <TextInput
               style={styles.qcInput}
-              placeholder="Write your post..."
+              placeholder="Start a discussion..."
+              placeholderTextColor={"grey"}
               value={post}
               onChangeText={handlePostChange}
               multiline
@@ -217,6 +241,61 @@ export default function MainPage() {
             <TouchableOpacity style={styles.qcPostSubmitButton} onPress={handlePostSubmit}>
               <Text style={styles.qcPostSubmitButtonText}>Submit</Text>
             </TouchableOpacity>
+            <View style={[styles.roadmapAndImage, { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }]}>
+              <TouchableOpacity style={styles.roadmap} onPress={() => {
+                closeQcModal();
+                openGeminiModal();
+              }}>
+                <Text style={styles.roadmapIcon}>
+                  <Icon name='map-signs' size={50} color="#6B8E23" />
+                </Text>
+                <Text style={styles.roadmapAndImageText}>Roadmap</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.imageGen} onPress={() => {
+                closeQcModal();
+                openGeminiModal();
+              }}>
+                <Text style={styles.imageIcon}>
+                  <Icon name='portrait' size={50} color="#6B8E23" />
+                </Text>
+                <Text style={styles.roadmapAndImageText}>Future Me</Text>
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={discussionHistory}
+              keyExtractor={(item) => item.name}
+              renderItem={({ item }) => (
+                <View style={styles.discussionItem}>
+                  <Image source={item.image} style={styles.jobImage} />
+                  <View style={styles.jobTextContainer}>
+                    <Text style={styles.jobTitle}>{item.name}</Text>
+                    <Text style={styles.jobDescription}>{item.description}</Text>
+
+                    {/* Icons Section */}
+                    <View style={styles.iconContainer}>
+                      {/* Comment Icon */}
+                      <TouchableOpacity onPress={() => console.log('Comment clicked')}>
+                        <Icon name="comment" size={15} color="#6B8E23" />
+                      </TouchableOpacity>
+                      <Text style={styles.iconText}> {item.comments}   </Text>
+
+                      {/* Upvote Icon */}
+                      <TouchableOpacity onPress={() => console.log('Upvote clicked')}>
+                        <Icon name="arrow-up" size={15} color="#6B8E23" />
+                      </TouchableOpacity>
+                      <Text style={styles.iconText}> {item.upvotes}   </Text>
+
+                      {/* Downvote Icon */}
+                      <TouchableOpacity onPress={() => console.log('Downvote clicked')}>
+                        <Icon name="arrow-down" size={15} color="#6B8E23" />
+                      </TouchableOpacity>
+                      <Text style={styles.iconText}> {item.downvotes}</Text>
+                    </View>
+                  </View>
+                </View>
+              )}
+            />
           </View>
         </View>
       </Modal>
@@ -324,6 +403,34 @@ export default function MainPage() {
 };
 
 const styles = StyleSheet.create({
+  oldGemma: {
+    padding: 1,
+  },
+  oldGemmaText: {
+    padding: 1,
+  },
+  roadmapAndImage: {
+    marginRight: 10,
+  },
+  roadmapIcon: {
+    marginLeft: 13,
+  },
+  imageIcon: {
+    marginLeft: 20,
+  },
+  roadmapAndImageText: {
+    fontSize: 18,
+    marginTop: 8,
+    color: 'white',
+    marginBottom: 30,
+  },
+  imageGen: {
+    width: 100,
+  },
+  roadmap: {
+    width: 100,
+    marginLeft: 30,
+  },
   geminiModalContainer: {
     width: '90%',
     height: '80%',
@@ -417,7 +524,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginTop: 5,
   },
   categoryText: {
     fontSize: 16,
@@ -562,28 +669,41 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   qcTitle: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
     marginTop: 30,
+    marginLeft: 34,
   },
   qcInput: {
-    height: 150,
-    borderColor: '#ccc',
+    height: 100,
+    borderColor: 'white',
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 5,
   },
-  qcSubmitButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 10,
+  qcPostSubmitButton: {
+    backgroundColor: '#6B8E23',
+    paddingVertical: 5,
     borderRadius: 5,
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: -5,
   },
-  qcSubmitButtonText: {
+  qcPostSubmitButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold'
+  },
+  discussionItem: {
+    flexDirection: 'row',
+    marginBottom: 15,
+    alignItems: 'center',
+    backgroundColor: 'white',
+    width: 310,
+    height: 90,
+    borderRadius: 10,
   },
 }); 

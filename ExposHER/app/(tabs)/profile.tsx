@@ -28,8 +28,8 @@ export default function MainPage() {
             senderType: 'chatbot',
             profileImage: require('../../assets/images/gemini_logo.png'),
             detailedHistory: [
-                { sender: 'You', message: "Hi Gemini! My mom is a Machine Learning Developer, and I want to learn more about the job. Can you tell me more about it?", time: "8:15 AM" },
-                { sender: 'Gemini Chatbot', message: "Sure, I'd be happy to tell you more about Machine Learning Developers!\nWhat is Machine Learning?\nMachine learning is a type of artificial intelligence (AI) that allows computers to learn from data without being explicitly programmed. This means that instead of giving a computer a set of rules to follow, you give it a bunch of data and let it figure out the rules on its own.\n...", time: "8:15 AM" }
+                { sender: 'You', message: "Hi Gemini! My dad is a machine learning engineer, and I want to learn more about the job. Can you tell me more about it?", time: "8:15 AM" },
+                { sender: 'Gemini Chatbot', message: "Sure, I'd be happy to tell you more about Machine Learning Engineers!\nWhat is Machine Learning?\nMachine learning is a type of artificial intelligence (AI) that allows computers to learn from data without being explicitly programmed. This means that instead of giving a computer a set of rules to follow, you give it a bunch of data and let it figure out the rules on its own.\n...", time: "8:15 AM" }
             ]
         },
         {
