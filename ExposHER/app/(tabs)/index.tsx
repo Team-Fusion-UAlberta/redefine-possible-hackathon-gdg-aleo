@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, I
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { GoogleGenAI } from "@google/genai";
 
-
 const categories = [
   { name: 'Science', icon: 'flask', color: '#FFB6C1' },
   { name: 'Trades', icon: 'wrench', color: '#6B8E23' },
@@ -192,18 +191,27 @@ export default function MainPage() {
       <Modal visible={qcModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.qcModalContent}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => {
-              closeQcModal();
-              openScienceModal();
-            }}>
-              <Text style={styles.qcCloseText}>x</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.closeButton} onPress={() => {
-              closeQcModal();
-              openGeminiModal();
-            }}>
-              <Text style={styles.qcCloseText}>roadmap</Text>
-            </TouchableOpacity>
+            <View style={styles.qcButtonContainer}>
+              <TouchableOpacity 
+                style={styles.qcCloseButton} 
+                onPress={() => {
+                  closeQcModal();
+                  openScienceModal();
+                }}
+              >
+                <Text style={styles.qcCloseText}>x</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.qcRoadmapButton}
+                onPress={() => {
+                  closeQcModal();
+                  openGeminiModal();
+                }}
+              >
+                <Text style={styles.qcRoadmapText}>roadmap</Text>
+              </TouchableOpacity>
+            </View>
+            
             <View style={styles.qcModalHeader}>
               <Text style={styles.qcTitle}>Quantum Computing</Text>
             </View>
@@ -459,6 +467,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
+  qcButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    width: '100%',
+    paddingHorizontal: 10,
+    marginTop: 10,
+  },
+  qcCloseButton: {
+    marginRight: 20,
+  },
+  qcRoadmapButton: {
+    // Additional styling can be added here if needed
+  },
+  qcRoadmapText:  {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    textDecorationLine: 'underline',
+  },
   qcCloseText: {
     fontSize: 30,
     fontWeight: 'bold',
@@ -545,12 +572,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 3,
   },
-  qcModalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#A8D08D',
-  },
   qcModalContent: {
     width: '90%',
     height: '80%',
@@ -575,15 +596,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20
   },
-  qcSubmitButton: {
+  qcPostSubmitButton: {
     backgroundColor: '#007BFF',
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center'
   },
-  qcSubmitButtonText: {
+  qcPostSubmitButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold'
   },
-}); 
+});
