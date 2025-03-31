@@ -199,9 +199,7 @@ export default function MainPage() {
                   openScienceModal();
                 }}
               >
-                <Text style={styles.qcCloseText}>x</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
+                <TouchableOpacity 
                 style={styles.qcRoadmapButton}
                 onPress={() => {
                   closeQcModal();
@@ -209,6 +207,8 @@ export default function MainPage() {
                 }}
               >
                 <Text style={styles.qcRoadmapText}>roadmap</Text>
+              </TouchableOpacity>
+                <Text style={styles.qcCloseText}>x</Text>
               </TouchableOpacity>
             </View>
             
