@@ -4,8 +4,6 @@ IWD Edmonton 2025: Redefine Possible Hackathon
 # How to Run
 npm install @react-native-async-storage/async-storage
 
-npm install firebase ??
-
 npm install @react-native-async-storage/async-storage
 
 npm install expo-router
