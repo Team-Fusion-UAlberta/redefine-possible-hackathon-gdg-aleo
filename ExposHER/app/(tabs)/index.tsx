@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, Image, ActivityIndicator, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Modal, Image, ActivityIndicator, ScrollView, SafeAreaView, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { GoogleGenAI } from "@google/genai";
+import { Ionicons } from '@expo/vector-icons';
 
 
 const categories = [
@@ -62,11 +63,14 @@ export default function MainPage() {
   const [scienceModalVisible, setScienceModalVisible] = useState(false);
   const [qcModalVisible, setQcModalVisible] = useState(false);
   const [geminiModalVisible, setGeminiModalVisible] = useState(false);
-  const [roadmapModalVisible, setRoadmapModalVisible] = useState(false);
+  const [futureModalVisible, setFutureModalVisible] = useState(false);
   const [post, setPost] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [inputMessage, setInputMessage] = useState('');
+  const { width, height } = Dimensions.get('window');
+
 
   // Initialize Gemini AI (move your API key to environment variables in production)
   const ai = new GoogleGenAI({ apiKey: "AIzaSyAKWZTiwgZcfsQi7yK177wakblerVQR96c" });
@@ -111,18 +115,25 @@ export default function MainPage() {
     setPost(text);
   };
 
-  const openRoadmapModal = () => {
-    setRoadmapModalVisible(true);
+  const openFutureModal = () => {
+    setFutureModalVisible(true);
   };
 
-  const closeRoadmapModal = () => {
-    setRoadmapModalVisible(false);
+  const closeFutureModal = () => {
+    setFutureModalVisible(false);
   };
 
   const handlePostSubmit = () => {
     // Submit the post (for now just log it to the console lol)
     console.log('New Post:', post);
     setPost(''); // Clear the input field
+  };
+
+  const handleSendMessage = () => {
+    if (inputMessage.trim()) {
+      // Handle sending message logic
+      setInputMessage('');
+    }
   };
 
   const handleSubmit = async () => {
@@ -154,6 +165,13 @@ export default function MainPage() {
       <Modal visible={geminiModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.geminiModalContainer}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => {
+              closeGeminiModal();
+              openQcModal();
+            }}>
+              <Text style={styles.closeText}>x</Text>
+            </TouchableOpacity>
+            <View style={styles.geminiModalBox}></View>
             <TouchableOpacity
               style={[styles.geminiSubmitButton, (isLoading) && styles.geminiSubmitButtonDisabled]}
               onPress={handleSubmit}
@@ -162,43 +180,71 @@ export default function MainPage() {
               {isLoading ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text style={styles.geminiSubmitText}>Get AI Response</Text>
+                <Text style={styles.geminiSubmitText}>Create Roadmap   <Icon name='map-signs' size={15} color="white" /></Text>
               )}
             </TouchableOpacity>
-
-            {error ? (
-              <Text style={styles.errorText}>{error}</Text>
-            ) : aiResponse ? (
-              <>
-                <Text style={styles.responseHeader}>Gemini Response:</Text>
-                <Text style={styles.responseText}>{aiResponse}</Text>
-              </>
-            ) : (
-              <Text style={styles.placeholderText}>Your AI response will appear here...</Text>
-            )}
+            <View style={styles.geminiReponseChatbox}>
+              {error ? (
+                <Text style={styles.errorText}>{error}</Text>
+              ) : aiResponse ? (
+                <>
+                  <View style={[styles.chatBubble, styles.leftBubble]}>
+                    <Text style={styles.responseText}>{aiResponse}</Text>
+                    <Icon name='expand-alt' size={15} color="white" style={styles.expandIcon} />
+                  </View>
+                </>
+              ) : (
+                <Text style={styles.geminiPlaceholderText}>Gemma's Gemini Roadmap...</Text>
+              )}
+              <View style={styles.inputContainer}>
+                <Ionicons name="attach" size={24} color="#6B8E23" style={styles.clipIcon} />
+                <TextInput
+                  style={styles.inputBox}
+                  placeholder="Type a message..."
+                />
+                <Ionicons
+                  name="send"
+                  size={24}
+                  color="#6B8E23"
+                  style={styles.sendIcon}
+                  onPress={handleSendMessage}
+                />
+              </View>
+            </View>
           </View>
         </View>
       </Modal>
 
+
+      {/* Future Modal */}
+      <Modal visible={futureModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.futureModalContent}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => {
+              closeFutureModal();
+              openQcModal();
+            }}>
+              <Text style={styles.closeText}>x</Text>
+            </TouchableOpacity>
+            <View style={styles.scienceModalBox}></View>
+
+            {/* Scaled Image */}
+            <Image
+              source={require('../../assets/images/old_gemma.png')}
+              style={[styles.oldGemmaPic, { width: width * 0.8, height: height * 0.4 }]}  // Adjust width and height as needed
+              resizeMode="contain"  // Scale the image to fit within the bounds
+            />
+
+            <Text style={styles.oldGemmaText}>Gemma as a Quantum Computing Researcher!</Text>
+          </View>
+        </View>
+      </Modal>
 
       {/* Popup Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <TouchableOpacity style={styles.closeButton} onPress={closePopup}>
-              <Text style={styles.closeText}>x</Text>
-            </TouchableOpacity>
-            <Image source={require('../../assets/images/old_gemma.png')} style={styles.oldGemma} />
-            <Text style={styles.oldGemmaText}>Gemma as a Quantum Computing Researcher!</Text>
-          </View>
-        </View>
-      </Modal>
-
-      {/* roadmap Modal */}
-      <Modal visible={roadmapModalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.closeButton} onPress={closeRoadmapModal}>
               <Text style={styles.closeText}>x</Text>
             </TouchableOpacity>
             <Image source={require('../../assets/images/carpenter.png')} style={styles.modalImage} />
@@ -215,7 +261,6 @@ export default function MainPage() {
           </View>
         </View>
       </Modal>
-
 
       {/* Quantum Computing Post Modal */}
       <Modal visible={qcModalVisible} animationType="slide" transparent={true}>
@@ -254,7 +299,7 @@ export default function MainPage() {
 
               <TouchableOpacity style={styles.imageGen} onPress={() => {
                 closeQcModal();
-                openGeminiModal();
+                openFutureModal();
               }}>
                 <Text style={styles.imageIcon}>
                   <Icon name='portrait' size={50} color="#6B8E23" />
@@ -403,11 +448,49 @@ export default function MainPage() {
 };
 
 const styles = StyleSheet.create({
-  oldGemma: {
-    padding: 1,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    marginTop: 440,
+    width: '100%',
+    padding: 10,
+  },
+  inputBox: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: '#f2f2f2',
+    marginRight: 5,
+  },
+  clipIcon: {
+    marginRight: 10,
+  },
+  sendIcon: {
+    marginLeft: 10,
+  },
+  expandIcon: {
+    marginLeft: 208,
+    marginTop: -10,
+  },
+  geminiReponseChatbox: {
+    height: 540,
+    width: "97%",
+    marginLeft: 9,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  geminiModalBox: {
+    marginTop: 30,
+  },
+  oldGemmaPic: {
   },
   oldGemmaText: {
-    padding: 1,
+    fontSize: 24,
+    color: 'black',
+    fontWeight: 'bold',
   },
   roadmapAndImage: {
     marginRight: 10,
@@ -417,6 +500,19 @@ const styles = StyleSheet.create({
   },
   imageIcon: {
     marginLeft: 20,
+  },
+  chatBubble: {
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 7,
+    maxWidth: '87%',
+  },
+  leftBubble: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#b1cf86',
+    marginRight: 50,
+    marginLeft: 10,
+    height: "60%",
   },
   roadmapAndImageText: {
     fontSize: 18,
@@ -433,7 +529,7 @@ const styles = StyleSheet.create({
   },
   geminiModalContainer: {
     width: '90%',
-    height: '80%',
+    height: '78%',
     backgroundColor: '#b1cf86',
     padding: 20,
     borderRadius: 10,
@@ -459,7 +555,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   responseText: {
-    backgroundColor: 'white',
+    backgroundColor: '#b1cf86',
     fontSize: 16,
     lineHeight: 24,
   },
@@ -469,6 +565,13 @@ const styles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
     marginTop: 20,
+  },
+  geminiPlaceholderText: {
+    backgroundColor: 'white',
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 15,
   },
   errorText: {
     backgroundColor: 'white',
@@ -540,6 +643,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
+    width: '89%',
+    backgroundColor: '#A8D08D',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  futureModalContent: {
     width: '89%',
     backgroundColor: '#A8D08D',
     padding: 20,
